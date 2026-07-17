@@ -167,11 +167,6 @@ st.markdown(
 # ---------- Sidebar ----------
 with st.sidebar:
     st.markdown("## Patient Profile")
-    uploaded_file = st.file_uploader(
-        "Upload Blood Report",
-        type=["csv", "xlsx", "xls"],
-        help="Start with CSV or Excel for the first version.",
-    )
     st.markdown("---")
     st.markdown("### Sample Blood Report")
 
@@ -249,6 +244,14 @@ left, right = st.columns([1.1, 0.9], gap="large")
 
 with left:
     st.markdown('<div class="card">', unsafe_allow_html=True)
+    
+    uploaded_file = st.file_uploader(
+        "Upload Blood Report",
+        type=["csv", "xlsx", "xls"],
+        help="Start with CSV or Excel for the first version.",
+    )
+
+
     st.markdown("### Upload & Analyze Blood Report")
     st.write("Upload the blood report here.")
 
