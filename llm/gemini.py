@@ -11,7 +11,7 @@ google_api_key = st.secrets.get(
 )
 
 llm = ChatGoogleGenerativeAI(
-    model="gemma-4-27b-it",
+    model="gemma-4-31b-it",
     google_api_key=google_api_key,
     temperature=0
 )
