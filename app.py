@@ -105,6 +105,48 @@ st.markdown(
             background: rgba(2, 6, 23, 0.95);
             border-right: 1px solid rgba(148, 163, 184, 0.12);
         }
+        
+        .loader-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 28px 18px;
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            margin-top: 12px;
+        }
+
+        .loader-ring {
+            width: 54px;
+            height: 54px;
+            border: 5px solid rgba(148, 163, 184, 0.22);
+            border-top: 5px solid #10b981;
+            border-right: 5px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e5e7eb;
+            text-align: center;
+        }
+
+        .loader-subtext {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
     <div class="footer-credit">All credit goes to &quot;Shrila Prabhupada Ji&quot; and Guru Maharaj &quot;H.H BPBM Ji&quot;</div>
     """,
@@ -226,6 +268,18 @@ with left:
             st.error("Please upload a blood report.")
 
         else:
+            loader = st.empty()
+            loader.markdown(
+                """
+                <div class="loader-box">
+                    <div class="loader-ring"></div>
+                    <div class="loader-text">Analyzing blood report...</div>
+                    <div class="loader-subtext">Reading file, normalizing values, and generating diet, exercise, and routine plans.</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
             try:
                 st.session_state.final_report = run_health_workflow(
                     uploaded_file,
@@ -236,6 +290,9 @@ with left:
 
             except Exception as e:
                 st.error(str(e))
+
+            finally:
+                loader.empty()
 
     final_report = st.session_state.final_report
 
