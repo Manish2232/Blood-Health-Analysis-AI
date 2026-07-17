@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 
 
-def load_report(file_obj) -> pd.DataFrame:
+def load_csv_report(file_obj) -> pd.DataFrame:
     """
     Read an uploaded CSV or Excel file and return a pandas DataFrame.
 

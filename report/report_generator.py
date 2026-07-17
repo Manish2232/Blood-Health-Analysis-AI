@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Dict, Any
-
+from dataclasses import asdict, is_dataclass    
 
 def generate_final_report(
     patient_profile: Dict[str, Any],
@@ -16,7 +16,7 @@ def generate_final_report(
     report = {
         "generated_at": datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
 
-        "patient_profile": patient_profile,
+        "patient_profile": asdict(patient_profile) if is_dataclass(patient_profile) else patient_profile,
 
         "blood_report_summary": blood_summary,
 

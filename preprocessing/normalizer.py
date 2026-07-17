@@ -54,33 +54,23 @@ def normalize_reference_range(reference_range):
 
 
 def normalize_report(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Standardize common blood report columns.
-
-    Expected columns (if available):
-    - TestName / Test Name
-    - Result
-    - Unit
-    - ReferenceRange / Reference Range
-    - Flag
-    - Remarks
-    """
     df = df.copy()
 
-    # Remove accidental spaces in column names
-    df.columns = [str(col).strip() for col in df.columns]
+    # Clean column names
+    df.columns = [str(col).strip().lower() for col in df.columns]
 
-    # Try to support multiple column naming patterns
+    # Case-insensitive alias mapping
     column_aliases = {
-        "TestName": ["TestName", "Test Name", "test_name", "name"],
-        "Result": ["Result", "result", "value"],
-        "Unit": ["Unit", "unit"],
-        "ReferenceRange": ["ReferenceRange", "Reference Range", "reference_range", "range"],
-        "Flag": ["Flag", "flag"],
-        "Remarks": ["Remarks", "remarks", "Comment", "comment"],
+        "TestName": ["testname", "test name", "name", "parameter", "analyte", "test"],
+        "Result": ["result", "value", "observed value", "reading", "result value"],
+        "Unit": ["unit", "units"],
+        "ReferenceRange": ["referencerange", "reference range", "normal range", "range"],
+        "Flag": ["flag", "status"],
+        "Remarks": ["remarks", "comment", "comments", "note"],
     }
 
     rename_map = {}
+
     for standard_name, aliases in column_aliases.items():
         for alias in aliases:
             if alias in df.columns:
@@ -89,7 +79,6 @@ def normalize_report(df: pd.DataFrame) -> pd.DataFrame:
 
     df = df.rename(columns=rename_map)
 
-    # Normalize if the key columns exist
     if "TestName" in df.columns:
         df["TestName"] = df["TestName"].apply(normalize_test_name)
 
@@ -101,5 +90,9 @@ def normalize_report(df: pd.DataFrame) -> pd.DataFrame:
 
     if "Flag" in df.columns:
         df["Flag"] = df["Flag"].apply(lambda x: str(x).strip().upper() if not pd.isna(x) else "")
+
+    # Final check
+    if "TestName" not in df.columns or "Result" not in df.columns:
+        raise ValueError(f"DataFrame must contain 'TestName' and 'Result' columns. Found: {list(df.columns)}")
 
     return df
