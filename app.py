@@ -1,5 +1,6 @@
 import streamlit as st
 from workflow.health_workflow import run_health_workflow
+from pathlib import Path
 
 st.set_page_config(
     page_title="Health Analysis AI",
@@ -129,6 +130,21 @@ with st.sidebar:
         type=["csv", "xlsx", "xls"],
         help="Start with CSV or Excel for the first version.",
     )
+    st.markdown("---")
+    st.markdown("### Sample Blood Report")
+
+    sample_csv = Path("sample_data/blood_report.csv")
+
+    if sample_csv.exists():
+        with open(sample_csv, "rb") as file:
+            st.download_button(
+                label="📥 Download Sample CSV",
+                data=file,
+                file_name="blood_report.csv",
+                mime="text/csv",
+            )
+    else:
+        st.warning("Sample CSV not found.")
 
     st.markdown("### Basic Details")
     age = st.number_input("Age", min_value=0, max_value=120, value=25)
