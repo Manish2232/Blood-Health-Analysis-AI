@@ -1,14 +1,14 @@
 import os
-import streamlit as st
 from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
+import streamlit as st
 
 load_dotenv()
 
-google_api_key = st.secrets.get(
-    "GOOGLE_API_KEY",
-    os.getenv("GOOGLE_API_KEY")
-)
+try:
+    google_api_key = st.secrets["GOOGLE_API_KEY"]
+except Exception:
+    google_api_key = os.getenv("GOOGLE_API_KEY")
 
 llm = ChatGoogleGenerativeAI(
     model="gemma-4-31b-it",
