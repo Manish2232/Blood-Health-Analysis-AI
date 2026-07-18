@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import json
 from pathlib import Path
 from dataclasses import asdict, is_dataclass
@@ -381,18 +382,24 @@ with left:
         type=["csv", "xlsx", "xls", "pdf"],
         label_visibility="collapsed",
     )
+    if uploaded_file is not None:
+        if st.session_state.get("last_uploaded") != uploaded_file.name:
+            st.session_state.final_report = None
+            st.session_state.last_uploaded = uploaded_file.name
 
     if uploaded_file is not None:
         st.markdown(
             f'<div class="status-chip status-ok">✅ Loaded: <b>{uploaded_file.name}</b></div>',
             unsafe_allow_html=True,
         )
+
+        st.caption(f"📦 File Size: {uploaded_file.size / 1024:.1f} KB")
+
     else:
         st.markdown(
             '<div class="status-chip status-idle">📎 No file uploaded yet</div>',
             unsafe_allow_html=True,
         )
-
     st.write("")
     analyze = st.button("🔍 Analyze Report", use_container_width=True)
 
@@ -404,12 +411,13 @@ with left:
             progress = st.progress(0)
             status = st.empty()
             try:
-                st.session_state.final_report = run_health_workflow(
-                    uploaded_file,
-                    patient_data,
-                    progress,
-                    status,
-                )
+                with st.spinner("🤖 AI is analyzing your report..."):
+                    st.session_state.final_report = run_health_workflow(
+                        uploaded_file,
+                        patient_data,
+                        progress,
+                        status,
+                    )
                 
             except Exception as e:
                 status.error(str(e))
@@ -473,7 +481,36 @@ with summary_tab:
     st.subheader("🧑 Patient Profile")
 
     if final_report:
-        st.json(make_json_safe(final_report["patient_profile"]))
+        profile = final_report["patient_profile"]
+
+        profile_df = pd.DataFrame({
+            "Field": [
+                "Age",
+                "Gender",
+                "Height",
+                "Weight",
+                "Diet Preference",
+                "Activity Level",
+                "Sleep Time",
+                "Known Condition",
+                "Medications",
+                "Allergies"
+            ],
+            "Value": [
+                profile["age"],
+                profile["gender"],
+                f"{profile['height_cm']} cm",
+                f"{profile['weight_kg']} kg",
+                profile["diet_preference"],
+                profile["activity_level"],
+                profile["sleep_time"],
+                profile["known_condition"] or "None",
+                profile["medications"] or "None",
+                profile["allergies"] or "None",
+            ]
+        })
+
+        st.table(profile_df)
         st.divider()
         st.subheader("🩸 Blood Test Summary")
         st.dataframe(final_report["blood_report_summary"], use_container_width=True)
