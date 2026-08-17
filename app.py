@@ -3,6 +3,7 @@ import pandas as pd
 import json
 from pathlib import Path
 from dataclasses import asdict, is_dataclass
+from report.exporter import build_report_pdf
 from workflow.health_workflow import run_health_workflow
 
 
@@ -303,6 +304,7 @@ with st.sidebar:
             st.warning("Sample CSV not found.")
 
     st.markdown("#### Basic Details")
+    name = st.text_input("Name", placeholder="Enter patient name")
     c1, c2 = st.columns(2)
     with c1:
         age = st.number_input("Age", min_value=0, max_value=120, value=25)
@@ -326,6 +328,7 @@ with st.sidebar:
     allergies = st.text_input("Food Allergies", placeholder="Optional")
 
     patient_data = {
+        "name": name,
         "age": age,
         "gender": gender,
         "height_cm": height,
@@ -426,13 +429,13 @@ with left:
 
     if final_report:
         st.write("")
-        safe_report = make_json_safe(final_report)
+        pdf_bytes = build_report_pdf(make_json_safe(final_report))
 
         st.download_button(
-            label="📥 Download Full Report (JSON)",
-            data=json.dumps(safe_report, indent=4, default=str),
-            file_name="Health_Report.json",
-            mime="application/json",
+            label="📥 Download Full Report (PDF)",
+            data=pdf_bytes,
+            file_name="Health_Report.pdf",
+            mime="application/pdf",
             use_container_width=True,
         )
 
@@ -485,6 +488,7 @@ with summary_tab:
 
         profile_df = pd.DataFrame({
             "Field": [
+                "Name",
                 "Age",
                 "Gender",
                 "Height",
@@ -497,6 +501,7 @@ with summary_tab:
                 "Allergies"
             ],
             "Value": [
+                profile.get("name") or "Not provided",
                 profile["age"],
                 profile["gender"],
                 f"{profile['height_cm']} cm",

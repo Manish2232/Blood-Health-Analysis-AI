@@ -4,32 +4,35 @@ from typing import Optional
 
 @dataclass
 class PatientProfile:
-    age: int
-    gender: str
-    height_cm: float
-    weight_kg: float
-    diet_preference: str
-    activity_level: str
-    sleep_time: str
+    name: str = ""
+    age: int = 0
+    gender: str = ""
+    height_cm: float = 0.0
+    weight_kg: float = 0.0
+    diet_preference: str = ""
+    activity_level: str = ""
+    sleep_time: str = ""
     known_condition: str = ""
     medications: str = ""
     allergies: str = ""
 
 
 def create_profile(
-    age: int,
-    gender: str,
-    height_cm: float,
-    weight_kg: float,
-    diet_preference: str,
-    activity_level: str,
-    sleep_time: str,
+    name: str = "",
+    age: int = 0,
+    gender: str = "",
+    height_cm: float = 0.0,
+    weight_kg: float = 0.0,
+    diet_preference: str = "",
+    activity_level: str = "",
+    sleep_time: str = "",
     known_condition: str = "",
     medications: str = "",
     allergies: str = "",
 ) -> PatientProfile:
     """Create a structured patient profile object."""
     return PatientProfile(
+        name=name,
         age=age,
         gender=gender,
         height_cm=height_cm,

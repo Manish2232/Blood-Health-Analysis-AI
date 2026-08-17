@@ -29,7 +29,6 @@ def run_health_workflow(
 
         if progress:
             progress.progress(15)
-            time.sleep(0.5)
 
     # Step 2: Normalize report
 
@@ -40,7 +39,6 @@ def run_health_workflow(
     
         if progress:
             progress.progress(30)
-            time.sleep(0.5)
 
     # Step 3: Analyze report
 
@@ -51,7 +49,6 @@ def run_health_workflow(
     
         if progress:
             progress.progress(45)
-            time.sleep(0.5)
 
     # Step 4: Create patient profile
 
@@ -62,7 +59,6 @@ def run_health_workflow(
 
         if progress:
             progress.progress(55)
-            time.sleep(0.5)
 
     # Step 5: Generate diet plan
 
@@ -73,7 +69,6 @@ def run_health_workflow(
 
         if progress:
             progress.progress(70)
-            time.sleep(0.5)
 
     # Step 6: Generate exercise plan
 
@@ -84,7 +79,6 @@ def run_health_workflow(
 
         if progress:
             progress.progress(85)
-            time.sleep(0.5)
 
     # Step 7: Generate daily routine
 
@@ -100,7 +94,6 @@ def run_health_workflow(
 
         if progress:
             progress.progress(95)
-            time.sleep(0.5)
 
     # Step 8: Generate final report
 
@@ -117,12 +110,9 @@ def run_health_workflow(
 
         if progress:
             progress.progress(100)
-            time.sleep(0.5)
 
         if status:
             status.success("✅ Report Generated Successfully!")
-
-        time.sleep(1)
 
         if progress:
             progress.empty()
