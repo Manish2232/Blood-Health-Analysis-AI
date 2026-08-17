@@ -25,6 +25,47 @@ def make_json_safe(obj):
 
     return obj
 
+
+def build_profile_table(profile: dict) -> pd.DataFrame:
+    if not profile:
+        return pd.DataFrame({"Field": [], "Value": []})
+
+    fields = [
+        "Name",
+        "Age",
+        "Gender",
+        "Height",
+        "Weight",
+        "Diet Preference",
+        "Activity Level",
+        "Sleep Time",
+        "Known Condition",
+        "Medications",
+        "Allergies",
+    ]
+    values = [
+        profile.get("name") or "Not provided",
+        profile.get("age"),
+        profile.get("gender"),
+        f"{profile.get('height_cm')} cm" if profile.get("height_cm") is not None else "Not provided",
+        f"{profile.get('weight_kg')} kg" if profile.get("weight_kg") is not None else "Not provided",
+        profile.get("diet_preference"),
+        profile.get("activity_level"),
+        profile.get("sleep_time"),
+        profile.get("known_condition") or "None",
+        profile.get("medications") or "None",
+        profile.get("allergies") or "None",
+    ]
+
+    for index, value in enumerate(values):
+        if value is None:
+            values[index] = "Not provided"
+
+    return pd.DataFrame({
+        "Field": fields,
+        "Value": [str(value) for value in values],
+    })
+
 # =====================================================================
 # PAGE CONFIG
 # =====================================================================
@@ -298,7 +339,7 @@ with st.sidebar:
                 data=sample_bytes,
                 file_name="blood_report.csv",
                 mime="text/csv",
-                use_container_width=True,
+                width="stretch",
             )
         else:
             st.warning("Sample CSV not found.")
@@ -404,7 +445,7 @@ with left:
             unsafe_allow_html=True,
         )
     st.write("")
-    analyze = st.button("🔍 Analyze Report", use_container_width=True)
+    analyze = st.button("🔍 Analyze Report", width="stretch")
 
     if analyze:
         if uploaded_file is None:
@@ -436,7 +477,7 @@ with left:
             data=pdf_bytes,
             file_name="Health_Report.pdf",
             mime="application/pdf",
-            use_container_width=True,
+            width="stretch",
         )
 
     st.markdown("</div>", unsafe_allow_html=True)
@@ -486,39 +527,23 @@ with summary_tab:
     if final_report:
         profile = final_report["patient_profile"]
 
-        profile_df = pd.DataFrame({
-            "Field": [
-                "Name",
-                "Age",
-                "Gender",
-                "Height",
-                "Weight",
-                "Diet Preference",
-                "Activity Level",
-                "Sleep Time",
-                "Known Condition",
-                "Medications",
-                "Allergies"
-            ],
-            "Value": [
-                profile.get("name") or "Not provided",
-                profile["age"],
-                profile["gender"],
-                f"{profile['height_cm']} cm",
-                f"{profile['weight_kg']} kg",
-                profile["diet_preference"],
-                profile["activity_level"],
-                profile["sleep_time"],
-                profile["known_condition"] or "None",
-                profile["medications"] or "None",
-                profile["allergies"] or "None",
-            ]
-        })
+        profile_df = build_profile_table(profile)
 
         st.table(profile_df)
         st.divider()
         st.subheader("🩸 Blood Test Summary")
-        st.dataframe(final_report["blood_report_summary"], use_container_width=True)
+
+        summary_data = final_report["blood_report_summary"]
+        if isinstance(summary_data, dict):
+            summary_df = pd.DataFrame(
+                [{"Test": str(key), "Value": str(value)} for key, value in summary_data.items()]
+            )
+        elif isinstance(summary_data, list):
+            summary_df = pd.DataFrame(summary_data)
+        else:
+            summary_df = pd.DataFrame([{"Test": "Summary", "Value": str(summary_data)}])
+
+        st.dataframe(summary_df, width="stretch")
     else:
         st.info("Click **Analyze Report** to generate results.")
     st.markdown("</div>", unsafe_allow_html=True)
